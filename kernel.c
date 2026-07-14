@@ -22,7 +22,7 @@
 
 #include <stdint.h>
 #include <stddef.h>
-// RozOS main library
+// KevosOS main library
 //
 // Made by:
 // Szymon Wolak (github:ROZcloud)
@@ -204,7 +204,7 @@ char* random() {
     
     return buf;
 }
-// RozOS Main
+// KevosOS Main
 // Made by:
 // Szymon Wolak (github:ROZcloud, email:aza756903@gmail.com)
 //
@@ -339,8 +339,8 @@ void acpi_disable(struct FADT* fadt) {
 }
 
 
-// RozOS GUI framework
-/* RozOS GUI Framework
+// KevosOS GUI framework
+/* KevosOS GUI Framework
 Version: 7.0
 */
 #define SCR_W 80
@@ -1252,7 +1252,7 @@ void db_execute_query(struct Window* win, struct Component* comp) {
 }
 
 void DBApp() {
-    int db_win = tui_create_window("RozOS Relational DB", 5, 2, 74, 22);
+    int db_win = tui_create_window("KevosOS Relational DB", 5, 2, 74, 22);
     
     ui_add_text(db_win, "CREATE TABLE t | DROP TABLE t | SELECT FROM t");
     ui_add_input(db_win, "SQL> ", db_input_buffer, 200);
@@ -1263,7 +1263,7 @@ void DBApp() {
 }
 
 /* ========================================================================= */
-/*       RozOS - SYSTEM PLIKÓW FAT32 (BEZPIECZNY, NIEZALEŻNY STEROWNIK)      */
+/*       KevosOS - SYSTEM PLIKÓW FAT32 (BEZPIECZNY, NIEZALEŻNY STEROWNIK)      */
 /* ========================================================================= */
 
 #define ATA_REG_DATA       0x1F0
@@ -1334,7 +1334,7 @@ static uint32_t Sectors_Per_Fat = 0;
 
 uint8_t cluster_scratchpad[8192];
 /* ========================================================================= */
-/* NISKIPOZIOMOWE OPERACJE ATA (POLLED IO DLA RozOS)                        */
+/* NISKIPOZIOMOWE OPERACJE ATA (POLLED IO DLA KevosOS)                        */
 /* ========================================================================= */
 
 void ata_read_sector(uint32_t lba, uint8_t* buffer) {
@@ -1527,7 +1527,7 @@ static int fs_resolve_path(const char* path, struct FAT32_DirEntry* out, uint32_
 }
 
 /* ========================================================================= */
-/* POLA WYCOFANIA (ZGODNE Z INTERFEJSEM ARCHITEKTURY RozOS)                  */
+/* POLA WYCOFANIA (ZGODNE Z INTERFEJSEM ARCHITEKTURY KevosOS)                  */
 /* ========================================================================= */
 
 int fs_init(void) {
@@ -1903,7 +1903,7 @@ void HEXR() {
     tui_refresh_screen();
 }
 
-struct RozOS_Framework {
+struct KevosOS_Framework {
     void (*refresh_screen)();
     int  (*create_window)(const char* title, int x, int y, int w, int h);
     void (*close_active_window)();
@@ -1924,7 +1924,7 @@ struct RozOS_Framework {
 };
 
 void exec(const char* path) {
-    struct RozOS_Framework* os = (struct RozOS_Framework*)0x400000;
+    struct KevosOS_Framework* os = (struct KevosOS_Framework*)0x400000;
     
     os->refresh_screen       = tui_refresh_screen;
     os->create_window        = tui_create_window;
@@ -1998,7 +1998,7 @@ void gui_init() {
     outb(0x3D5, 0x20);
     tui_init_framework();
     ui_set_bottom_help(" F10 Menu Alt+X Close Alt+Arrow Window pos Alt+TAB Switch window");
-    int cat_sys = ui_menu_add_category("RozOS");
+    int cat_sys = ui_menu_add_category("KevosOS");
     int cat_win = ui_menu_add_category("Window");
     ui_menu_add_item(cat_win, "Close", tui_close_active_window);
     ui_menu_add_item(cat_sys, "Launcher", launcher);
@@ -2008,13 +2008,15 @@ void gui_init() {
     int Run = ui_menu_add_category("Run Program");
     ui_menu_add_item(Run, "Database", DBApp);
     int win2 = tui_create_window("System", 0, 0, 40, 16);
-    ui_add_text(win2, "Welcome to RozOS running on\n the ROZ work terminal");
+    ui_add_text(win2, "Welcome to KevosOS 0.1.3");
     tui_refresh_screen();
     tui_refresh_screen();
 }
 
 void kernel_main(unsigned int magic, struct multiboot_info* mbi) {
-    
+    print("KevosOS 0.1.3 Loaded", 0, 0, 0x0E);
+    delay(1000)
+    clear()
     //if (fs_init()) {
     //    print("Mounted /", 0, 0, 0x0F);
     //} else {
@@ -2025,7 +2027,7 @@ void kernel_main(unsigned int magic, struct multiboot_info* mbi) {
     clear();
     if (boot_param(mbi, "info_boot=1")) {
         clear();
-	    print("RozOS 0.1.3", 0, 0, 0x0E);
+	    print("KevosOS 0.1.3", 0, 0, 0x0E);
         print("32 BIT MODE 16 CHAR BUFFER 1MB IMAGE", 1, 0, 0x0A);
         print("To exit press power button", 2, 0, 0x0F);
 	    asm volatile (
@@ -2045,21 +2047,13 @@ void kernel_main(unsigned int magic, struct multiboot_info* mbi) {
 	        acpi_enable(fadt);
         }
     }
-    gui_init();
-    tui_refresh_screen();
-    while(1) {
-        if (inb(0x64) & 1) {
-            unsigned char scancode = inb(0x60);
-            tui_dispatch_keyboard(scancode);
-        }
-    }
     while(1) {
         clear();
-        print("RozOS 0.1.3", 0, 0, 0x0E);
+        print("KevosOS 0.1.3", 0, 0, 0x0E);
         print("32 BIT MODE 16 CHAR BUFFER 1MB IMAGE", 1, 0, 0x0A);
         print("SLEEP MODE ACTIVE", 2, 0, 0x0A);
 	    print("Type / to help", 3, 0, 0x0A);
-        print("RozOS>> ", 4, 0, 0x0F);
+        print("KevosOS>> ", 4, 0, 0x0F);
 
         char buffer[16] = {0};
         input(buffer, 4, 8, 10);
@@ -2078,12 +2072,12 @@ void kernel_main(unsigned int magic, struct multiboot_info* mbi) {
             clear();
         }
 	    else if(strcmp(buffer, "version") == 0) {
-	        print("RozOS 0.1.1 Home edition", 5, 0, 0x0A);
+	        print("KevosOS 0.1.1 Home edition", 5, 0, 0x0A);
 	        print("build: 000010", 6, 0, 0x0A);
 	        print("add-ons: input fix, halt fix, ststus fix", 7, 0, 0x0A);
-	        print("RozOS is Open Source", 8, 0, 0x0A);
+	        print("KevosOS is Open Source", 8, 0, 0x0A);
 	        print("Made by:Szymon Wolak (github:ROZcloud)", 9, 0, 0x0A);
-	        print("Project github:github.com/ROZcloud/RozOShe", 10, 0, 0x0A);
+	        print("Project github:github.com/ROZcloud/KevosOShe", 10, 0, 0x0A);
 	        delay(1000);
 	    }
 	    else if(strcmp(buffer, "hex") == 0) {
@@ -2107,7 +2101,7 @@ void kernel_main(unsigned int magic, struct multiboot_info* mbi) {
 	        print("version - show system version", 6, 0, 0x0F);
 	        print("hex - enter and run hex", 7, 0, 0x0F);
 	        print("lock - lock user", 8, 0, 0x0F);
-            print("gui - start RozOS TUI", 8, 0, 0x0F);
+            print("gui - start KevosOS TUI", 8, 0, 0x0F);
 	        delay(1000);
 	    }
 	    else if(strcmp(buffer, "logout") == 0) {
